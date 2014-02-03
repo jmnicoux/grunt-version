@@ -16,7 +16,8 @@ module.exports = function(grunt) {
       prefix: '[^\\-]version[\'"]?\\s*[:=]\\s*[\'"]',
       replace: '[0-9a-zA-Z\\-_\\+\\.]+',
       pkg: 'package.json',
-      release: ''
+      release: '',
+      prereleasePrefix: ''
     });
 
     if (typeof options.pkg === 'string') {
@@ -25,12 +26,28 @@ module.exports = function(grunt) {
 
     var newVersion,
         release = this.args && this.args[0] || options.release,
+        prereleasePrefix = this.args && this.args[1] || options.prereleasePrefix,
         semver = require('semver'),
         version = options.pkg.version,
+        prefixpre = /alpha|beta|rc/.test(prereleasePrefix),
         bump = /major|minor|patch|prerelease/.test(release),
-        literal = semver.valid(release);
+        literal = semver.valid(release),
+        composePrerelease,
+        testpreprefix = new RegExp('.*-' + prereleasePrefix + '.*');
 
-    if ( bump && semver.valid(version) ) {
+    if ( bump && semver.valid(version) && release === 'prerelease' && prefixpre ) {
+      if ( testpreprefix.test(version) || !(/.*-alpha|beta|rc.*/.test(version)) ) {
+        newVersion = semver.inc(version, release);
+      } else {
+        composePrerelease = version.split('-');
+        newVersion = composePrerelease[0];
+        newVersion = semver.inc(newVersion, release);
+      }
+      if ( !(/.*-alpha|beta|rc.*/.test(newVersion)) ) {
+        composePrerelease = newVersion.split('-');
+        newVersion = composePrerelease[0] + '-' + prereleasePrefix + '.' + composePrerelease[1];
+      }
+    } else if ( bump && semver.valid(version) ) {
       newVersion = semver.inc(version, release);
     } else if (literal) {
       newVersion = literal;

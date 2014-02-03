@@ -101,5 +101,19 @@ exports.version = {
     });
 
     test.done();
+  },
+  prerelease_prefix: function(test) {
+    var files = grunt.config('version.prerelease_prefix.src');
+    test.expect(files.length);
+
+    files.forEach(function(file) {
+      var content = grunt.file.read(file);
+      var actual = /version['"]?\s*[:=] ['"](\d\.\d\.\d[\-\+a-zA-Z0-9\.]*)/.exec(content);
+      actual = actual && actual[1];
+
+      test.equal(actual, '1.2.3-beta.0', 'Increments the version and updates the file.');
+    });
+
+    test.done();    
   }
 };

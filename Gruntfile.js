@@ -61,6 +61,18 @@ module.exports = function(grunt) {
         'tmp/test-package-v.json'
       ]
     },
+    prerelease_prefix: {
+    options: {
+        release: 'prerelease',
+        prereleasePrefix: 'beta',
+        pkg: 'test/fixtures/test-package-prerelease_prefix.json'
+      },
+      src: [
+        'tmp/123-prerelease_prefix.js',
+        'tmp/test-package-prerelease_prefix.json',
+        'tmp/test-package-prerelease_prefix_with_prefix.json'
+      ]
+    },
   };
 
   // Project configuration.
@@ -140,6 +152,7 @@ module.exports = function(grunt) {
     'version:literal',
     'version:minor',
     'version:prerelease_build',
+    'version:prerelease_prefix',
     'nodeunit'
   ]);
 
